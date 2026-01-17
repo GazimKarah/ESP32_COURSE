@@ -36,7 +36,7 @@ void loop() {
       if (c == '\n'){
         lineBuffer[lineIndex] = '\0';
         Serial.print("You typed: ");
-        Serial.print(lineBuffer);
+        Serial.println(lineBuffer);
         lineIndex = 0;
       }
       else {
@@ -49,23 +49,4 @@ void loop() {
       }
     }
 
-    // if(Serial.available() != 0){
-
-    //   buffer[head] = Serial.read();
-      
-    //   if(buffer[head] == '\n' ){
-    //     buffer[head] = '\0';
-    //     Serial.print(buffer);
-    //     head = 0;
-    //     tail = 0;
-    //   }
-    //   else if(buffer[head] != '\n'){
-    //   head = (head + 1) % sizeof(buffer); 
-    //   }
-
-    // }
-    // if (tail != head){
-    //   Serial.print(buffer[tail]);
-    //   tail = (tail + 1) % sizeof(buffer);
-    // }
 }
