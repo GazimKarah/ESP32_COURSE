@@ -23,8 +23,8 @@ void loop() {
 
     if (Serial.available() != 0){
       c = Serial.read();
-      Serial.write(c);
-
+      Serial.write(c); // Echo back the received character
+      
       if (c == '\n'){
         lineBuffer[lineIndex] = '\0';
         if(strcmp(lineBuffer, "LED ON") ==0){
@@ -39,9 +39,13 @@ void loop() {
           Serial.print("System Time: ");
           Serial.println(CurrentTime);
         }
-        Serial.print("You typed: ");
-        Serial.println(lineBuffer);
         lineIndex = 0;
+      }
+      else if (c == '\b' || c == 8){
+        if(lineIndex > 0){
+          lineIndex--;
+          lineBuffer[lineIndex] = '\0';
+        }
       }
       else if (c != '\r'){
         lineBuffer[lineIndex] = c;
