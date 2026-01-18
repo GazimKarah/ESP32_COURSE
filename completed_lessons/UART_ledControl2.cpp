@@ -3,7 +3,7 @@
 #define LED_PIN 2
 
 unsigned long Time = 0 ;
-unsigned long WaitingTime = 1000;
+unsigned long WaitingTime = 1000 ;
 
 char lineBuffer[32];
 int lineIndex = 0;
@@ -13,7 +13,7 @@ void setup() {
   pinMode(LED_PIN, OUTPUT);
   
   Serial.begin(115200);
-  Serial.println("\n Serial Initialized and LED Period set to 1000 ms");
+  Serial.println(" Serial Initialized");
 
 }
 void loop() {
@@ -21,16 +21,23 @@ void loop() {
   char c;
   unsigned long CurrentTime = millis();
 
-
     if (Serial.available() != 0){
       c = Serial.read();
       
       if (c == '\n'){
         Serial.println(); // Echo newline
         lineBuffer[lineIndex] = '\0';
-        if(strncmp(lineBuffer, "period " , 7) ==0){
-          WaitingTime = atoi(&lineBuffer[7]);
-          Serial.println("Period set to " + String(WaitingTime) + " ms");
+        if(strcmp(lineBuffer, "LED ON") ==0){
+          digitalWrite(LED_PIN, HIGH);
+          Serial.println("LED turned ON");
+        }
+        else if(strcmp(lineBuffer, "LED OFF") ==0){
+          digitalWrite(LED_PIN, LOW);
+          Serial.println("LED turned OFF");
+        }
+        else if(strcmp(lineBuffer, "status") == 0){
+          Serial.print("System Time: ");
+          Serial.println(CurrentTime);
         }
         else {
           Serial.println("Unknown Command");
@@ -56,8 +63,5 @@ void loop() {
 
       }
     }
-    if (CurrentTime - Time >=  WaitingTime){
-      Time = CurrentTime;
-      digitalWrite(LED_PIN, !digitalRead(LED_PIN));
-    }
+
 }

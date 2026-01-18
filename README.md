@@ -1,31 +1,35 @@
-# Ders 1.1: Non-Blocking Blink
+# ESP32 Bare Metal Programming - Module 1: UART & Architecture
 
-## 1. Amaç
-Bu modül, işlemciyi durdurmadan (blocking delay kullanmadan) zaman yönetimi yapmayı ve "Super Loop" mimarisini kavramayı amaçlar.
+This repository documents the learning journey of building a non-blocking, CLI-driven embedded system on the ESP32 using the Arduino framework but focusing on C/C++ fundamentals.
 
-## 2. Donanım Konfigürasyonu
-* **MCU:** ESP32 devkit v1
-* **Periferikler:** Dahili LED (GPIO 2 )
+## Project Structure
 
-## 3. Yazılım Mimarisi
-* **Framework:** Arduino
-* **Yöntem:** `millis()` tabanlı zaman farkı kontrolü.
+The project is evolved through iterative lessons, moving from basic blocking code to asynchronous architectures.
 
-## 4. Test ve Doğrulama
-* [X] Kod derleniyor ve karta yükleniyor.
-* [X] LED, `delay()` kullanılmadan belirlenen periyotta yanıp sönüyor.
-* [X] Buton/Sistem etkileşimi sırasında LED donmuyor.
+### 📂 src/ (Current Active Project)
+- **main.cpp**: The final output of Module 1. A hybrid system that maintains a non-blocking LED blink task while listening for CLI commands.
+  - **Feature**: Supports `period <ms>` command to dynamically change blink frequency without pausing execution.
+  - **Technique**: Uses parsing (`strncmp`, `atoi`) and pointer arithmetic for command processing.
 
-## 5. Notlar
-* SysTick mekanizması Arduino `millis()` fonksiyonu ile soyutlanmıştır.
+### 📂 completed_lessons/ (Archives)
+These files represent the steps taken to reach the final architecture:
 
-## Ders 1.3: CLI (Komut Satırı Arayüzü) - Temel
-* **Amaç:** UART üzerinden gelen veriyi karakter karakter toplamak ve anlamlı bir komut satırı (String) oluşturmak.
-* **Kazanımlar:**
-    * `buffer` ve `lineBuffer` farkı (Taşıma vs. Anlamlandırma).
-    * `\n` (Newline) karakteri ile paket sonu tespiti.
-    * Null Terminator (`\0`) önemi.
-* **Durum:**
-    * [x] Echo (Yazılanın geri gelmesi) çalışıyor.
-    * [x] Enter'a basınca satırın tamamlanması çalışıyor.
-    * [ ] Komutların işlenmesi (Parsing) [Sırada]
+| Filename | Description |
+| :--- | :--- |
+| **led_blink.cpp** | Introduction to GPIO control using `millis()` for non-blocking delays (replacing `delay()`). |
+| **UART_begin.cpp** | Basic Serial communication initialization and "Hello World". |
+| **UART_1.cpp** | Implementation of a custom Ring Buffer logic (Head/Tail indices) to understand data flow manually. |
+| **UART_ledControl.cpp** | Basic parser to toggle LED using specific string commands ("LED ON"). |
+| **UART_ledControl2.cpp** | Advanced CLI parser with terminal emulation features (Echo, Backspace handling, Input Buffer management). |
+| **MiniProject_1.cpp** | (Backup) The code for the dynamic period controller. |
+
+## Key Concepts Covered
+* **Non-Blocking Architecture:** `millis()` based state machines.
+* **UART Polling:** Byte-by-byte data processing without `readString()`.
+* **Buffer Management:** Handling overflows, null-termination (`\0`), and memory safety.
+* **Parsing:** Using `strcmp`, `strncmp`, and `atoi` with pointer offsets.
+* **Terminal UX:** Handling Backspace (`\b`), Carriage Return (`\r`), and Newline (`\n`) for a natural typing experience.
+
+---
+*Author: [Your Name/Handle]*
+*Target Hardware: ESP32 Dev Module*
