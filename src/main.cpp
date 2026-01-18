@@ -13,7 +13,7 @@ void setup() {
   pinMode(LED_PIN, OUTPUT);
   
   Serial.begin(115200);
-  Serial.println("Serial Initialized");
+  Serial.println(" Serial Initialized");
 
 }
 void loop() {
@@ -23,9 +23,9 @@ void loop() {
 
     if (Serial.available() != 0){
       c = Serial.read();
-      Serial.write(c); // Echo back the received character
       
       if (c == '\n'){
+        Serial.println(); // Echo newline
         lineBuffer[lineIndex] = '\0';
         if(strcmp(lineBuffer, "LED ON") ==0){
           digitalWrite(LED_PIN, HIGH);
@@ -39,15 +39,22 @@ void loop() {
           Serial.print("System Time: ");
           Serial.println(CurrentTime);
         }
+        else {
+          Serial.println("Unknown Command");
+        }
         lineIndex = 0;
       }
-      else if (c == '\b' || c == 8){
+
+      else if (c == '\b' || c == 127){
         if(lineIndex > 0){
           lineIndex--;
-          lineBuffer[lineIndex] = '\0';
+          lineBuffer[lineIndex] = '\0';  // Null-terminate the string that means the phrase has came to an end
+          Serial.print("\b \b"); // Move cursor back, print space, move cursor back again
         }
       }
       else if (c != '\r'){
+        Serial.write(c); // Echo back the received character
+        
         lineBuffer[lineIndex] = c;
         lineIndex++;
         if(lineIndex >= sizeof(lineBuffer) - 1){
