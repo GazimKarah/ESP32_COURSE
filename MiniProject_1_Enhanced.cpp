@@ -34,7 +34,7 @@ void loop() {
     if (overflowed == true) {
 
         
-        if(c == '\n'){
+        if(c == '\n' || c == '\r') {
 
             overflowed = false;
             lineIndex = 0;
@@ -50,7 +50,7 @@ void loop() {
     else {
 
         Serial.write(c); // Echo back the received character
-        
+
         if (c == '\b' || c == 127){
 
             if(lineIndex > 0){
@@ -60,8 +60,9 @@ void loop() {
             }
         }
         
-        if (c == '\n'){
+        else if (c == '\n' || c == '\r') {
 
+            handled = false;
             Serial.println(); // Echo newline
             lineBuffer[lineIndex] = '\0';
 
@@ -72,12 +73,12 @@ void loop() {
                 while (*arg == ' ') arg++; // Skip spaces
                    
                 if(*arg == '\0'){
-                    Serial.println('ERR: Missing Number Argument.');
+                    Serial.println("ERR: Missing Number Argument.");
                     handled = true;
                 }
                 else if(!AllDigits(arg)){
 
-                    Serial.println('ERR: Invalid Number Argument.');
+                    Serial.println("ERR: Invalid Number Argument.");
                     handled = true;
                 }
                 else {
@@ -89,10 +90,10 @@ void loop() {
                     const unsigned long MAX_PERIOD = 60000; // 60 seconds
 
                     if(!ok){
-                        Serial.println('ERR: Invalid Number Argument.');
+                        Serial.println("ERR: Invalid Number Argument.");
                     }
                     else if (period < MIN_PERIOD || period > MAX_PERIOD){
-                        Serial.println('ERR: Period Out Of Range. Must be between ' + String(MIN_PERIOD) + ' ms and ' + String(MAX_PERIOD) + ' ms.');
+                        Serial.println("ERR: Period Out Of Range. Must be between " + String(MIN_PERIOD) + " ms and " + String(MAX_PERIOD) + " ms.");
                     }
                     else{
                         WaitingTime = period;
@@ -106,11 +107,23 @@ void loop() {
 
             }
 
-            if (handled == false){
+            else if (handled == false){
             
                 Serial.println("Unknown Command");
 
             }
+            else{
+                // Command was handled successfully
+                if(lineIndex < sizeof(lineBuffer) - 1){
+                    lineBuffer[lineIndex++] = c;
+                    lineBuffer[lineIndex] = '\0'; // Null-terminate the string
+                    Serial.write(c); // Echo back the received character
+
+                }
+                else {
+                    overflowed = true;
+                    continue;
+                }
             
             }
             
