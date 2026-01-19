@@ -7,6 +7,7 @@ unsigned long WaitingTime = 1000;
 
 char lineBuffer[32];
 int lineIndex = 0;
+bool overflowed = false;
 
 void setup() {
 
@@ -22,42 +23,79 @@ void loop() {
   unsigned long CurrentTime = millis();
 
 
-    if (Serial.available() != 0){
+    while (Serial.available() != 0){
       c = Serial.read();
       
+      if (overflowed == true){
+        
+        if (c == '\n' || c == '\r'){
+          
+          Serial.println("ERR: Input Overflow. Command too long.");
+          overflowed = false;
+          lineIndex = 0;
+          lineBuffer[0] = '\0';
+        
+        }
+      
+
+      }
+      
       if (c == '\n'){
+        
         Serial.println(); // Echo newline
         lineBuffer[lineIndex] = '\0';
+        
         if(strncmp(lineBuffer, "period " , 7) ==0){
+          
           WaitingTime = atoi(&lineBuffer[7]);
           Serial.println("Period set to " + String(WaitingTime) + " ms");
+        
         }
+        
         else {
+          
           Serial.println("Unknown Command");
+        
         }
+        
         lineIndex = 0;
+      
       }
 
+      
       else if (c == '\b' || c == 127){
+        
+        
         if(lineIndex > 0){
+          
           lineIndex--;
           lineBuffer[lineIndex] = '\0';  // Null-terminate the string that means the phrase has came to an end
           Serial.print("\b \b"); // Move cursor back, print space, move cursor back again
-        }
-      }
-      else if (c != '\r'){
-        Serial.write(c); // Echo back the received character
         
-        lineBuffer[lineIndex] = c;
-        lineIndex++;
-        if(lineIndex >= sizeof(lineBuffer) - 1){
-          lineIndex = sizeof(lineBuffer) - 2;
         }
-
+      
       }
+      
+      else if (c != '\r'){
+
+        Serial.write(c); // Echo back the received character
+          
+          if(lineIndex < sizeof(lineBuffer) - 1){
+            lineBuffer[lineIndex] = c;
+            lineIndex++;
+          }
+          else {
+            overflowed = true;
+            continue;
+          }
+        }
+   
     }
-    if (CurrentTime - Time >=  WaitingTime){
+
+    if (CurrentTime - Time >= WaitingTime){
+
       Time = CurrentTime;
       digitalWrite(LED_PIN, !digitalRead(LED_PIN));
+    
     }
 }
