@@ -27,14 +27,21 @@ void loop() {
   char c;
   unsigned long CurrentTime = millis();
 
+      if (CurrentTime - Time >= WaitingTime){
+
+      Time = CurrentTime;
+      digitalWrite(LED_PIN, !digitalRead(LED_PIN));
+      }
+
   while (Serial.available() != 0) {
 
     c = Serial.read();
 
+    // Handle input overflow
     if (overflowed == true) {
 
         
-        if(c == '\n' || c == '\r') {
+        if(c == '\n') {
 
             overflowed = false;
             lineIndex = 0;
@@ -44,29 +51,33 @@ void loop() {
             continue;
 
         }
-        continue;
+        continue; // Discard characters until newline is received
+    }
+    if (c == '\b' || c == 127){
+
+        if(lineIndex > 0){ 
+            lineIndex--;
+            lineBuffer[lineIndex] = '\0';  // Null-terminate the string that means the phrase has came to an end
+            Serial.print("\b \b"); // Move cursor back, print space, move cursor back again
+        }
+        continue; // Ignore backspace if at the start of the line
     }
 
+    if (c == '\r') {
+    continue;
+    }
     else {
 
-        Serial.write(c); // Echo back the received character
-
-        if (c == '\b' || c == 127){
-
-            if(lineIndex > 0){
-                lineIndex--;
-                lineBuffer[lineIndex] = '\0';  // Null-terminate the string that means the phrase has came to an end
-                Serial.print("\b \b"); // Move cursor back, print space, move cursor back again
-            }
-        }
-        
-        else if (c == '\n' || c == '\r') {
+        // Check for newline character to process the command
+        if (c == '\n') {
 
             handled = false;
             Serial.println(); // Echo newline
             lineBuffer[lineIndex] = '\0';
 
+            //Command Parsing
             if(strncmp(lineBuffer, "period" , 6) ==0){
+
             // Is "period" command
                 if(lineBuffer[6] == '\0' || lineBuffer[6] == ' '){
                     char* arg = &lineBuffer[6]; // Pointer to the argument part
@@ -102,19 +113,19 @@ void loop() {
                     handled = true;
                     }
                 }
-
-
-
             }
 
-            else if (handled == false){
-            
+            if (handled == false && lineIndex > 0){
                 Serial.println("Unknown Command");
-
             }
-            else{
+
+                    lineIndex = 0;
+                    lineBuffer[0] = '\0';
+                    continue;
+        }
+
                 // Command was handled successfully
-                if(lineIndex < sizeof(lineBuffer) - 1){
+                if(lineIndex < (int)sizeof(lineBuffer) - 1){
                     lineBuffer[lineIndex++] = c;
                     lineBuffer[lineIndex] = '\0'; // Null-terminate the string
                     Serial.write(c); // Echo back the received character
@@ -122,25 +133,13 @@ void loop() {
                 }
                 else {
                     overflowed = true;
-                    continue;
                 }
-            
-            }
-            
-        }
-
-
 
     }
-
-    if (CurrentTime - Time >= WaitingTime){
-
-      Time = CurrentTime;
-      digitalWrite(LED_PIN, !digitalRead(LED_PIN));
-    
-    }
-
+  }
 }
+
+
 unsigned long parseMs(const char* s, bool* ok){ // Parses a string to extract an unsigned long representing milliseconds
 
     char* endptr = nullptr; // Pointer to track where parsing stopped
@@ -157,4 +156,4 @@ bool AllDigits(const char* s){
         
     }
     return true; // All characters are digits
-}
+    }
