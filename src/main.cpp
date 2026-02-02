@@ -30,7 +30,7 @@ void setup() {
   lcd.init();
   lcd.clear();
   lcd.set_cursor(0, 0); // row 0, column 0
-  lcd.print_string("Merhaba!");
+  lcd.print_string("Merhaba Yahya!");
 }
 void loop() {
   // Nothing here
