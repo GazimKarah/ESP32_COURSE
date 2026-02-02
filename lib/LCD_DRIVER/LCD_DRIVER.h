@@ -19,7 +19,7 @@ P7        → D7
 #define LCD_CMD_MODE 0
 #define LCD_DATA_MODE 1
 #define LCD_BACKLIGHT 0x08
-#define  LCD_ENABLE 0x04
+#define LCD_ENABLE 0x04
 #define LCD_WIDTH 16
 
 #define LCD_DRIVER_H
@@ -31,14 +31,15 @@ P7        → D7
             uint8_t lcd_address; //i2c address of the LCD
             void send_nibble(uint8_t nibble, uint8_t mode);
             void send_byte(uint8_t byte, uint8_t mode);
+            void pulse_enable(uint8_t data);
 
         public:
 
             LCD_DRIVER(uint8_t address);
 
             void init();
-            void print_char();
-            void print_string();
+            void print_char(char c);
+            void print_string(const char* str);
             void clear();
             void set_cursor(uint8_t row, uint8_t col);
     };

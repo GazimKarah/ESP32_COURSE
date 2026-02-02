@@ -11,6 +11,7 @@ void LCD_DRIVER::pulse_enable(uint8_t data)
 {
     // Code to pulse the enable pin
     Wire.beginTransmission(lcd_address);
+    Wire.write(data & ~LCD_ENABLE);
     Wire.write(data | LCD_ENABLE);
     Wire.endTransmission();
     delayMicroseconds(1); // Enable pulse must be >450ns
@@ -24,7 +25,7 @@ void LCD_DRIVER::send_nibble(uint8_t nibble, uint8_t mode)
 {
     // Code to send a nibble to the LCD
 
-    uint8_t packet = (nibble << 4) & 0x0F0; // Shift nibble to higher bits
+    uint8_t packet = (nibble << 4) & 0xF0; // Shift nibble to higher bits
     packet |= LCD_BACKLIGHT; // Turn on backlight
     if (mode == LCD_DATA_MODE){
         packet |= 0x01; // Set RS for data mode
@@ -48,37 +49,54 @@ void LCD_DRIVER::init()
 {
     // Initialization code for the LCD
     delay(50); // Wait for LCD to power up
-    send_nibble(0x30, LCD_CMD_MODE);
+    send_nibble(0x03, LCD_CMD_MODE);
     delay(5);
-    send_nibble(0x20, LCD_CMD_MODE);
+    send_nibble(0x03, LCD_CMD_MODE); 
+    delayMicroseconds(150);
+    
+    send_nibble(0x03, LCD_CMD_MODE);
+    delayMicroseconds(150);
+
+    send_nibble(0x02, LCD_CMD_MODE);
     delayMicroseconds(50);
-    send_nibble(0x20, LCD_CMD_MODE);
-    delayMicroseconds(50);
+
+    send_nibble(0x02, LCD_CMD_MODE); // Function Set: 4-bit mode
+    send_nibble(0x08, LCD_CMD_MODE);
 
     send_nibble(0x00, LCD_CMD_MODE); // Display ON
-    send_nibble(0xC0, LCD_CMD_MODE);
+    send_nibble(0x0C, LCD_CMD_MODE);
 
     send_nibble(0x00, LCD_CMD_MODE); //Display Clear
-    send_nibble(0x10, LCD_CMD_MODE);
+    send_nibble(0x01, LCD_CMD_MODE);
     delay(2);
 
-    send_nibble(0x60, LCD_CMD_MODE); // Entry Mode Set
+    send_nibble(0x00, LCD_CMD_MODE); // Entry Mode Set
+    send_nibble(0x06, LCD_CMD_MODE);
     delay(5);
 }
 
-void LCD_DRIVER::print_char()
+void LCD_DRIVER::print_char(char c)
 {
     // Code to print a character on the LCD
+    send_byte((uint8_t)c, LCD_DATA_MODE);
 }
-void LCD_DRIVER::print_string()
+
+void LCD_DRIVER::print_string(const char* str)
 {
     // Code to print a string on the LCD
+    while (*str !='\0'){
+        print_char(*str);
+        str++;
+    }
 }
 void LCD_DRIVER::clear()
 {
     // Code to clear the LCD display
     send_byte(0x01, LCD_CMD_MODE); 
+    delay(2); // Clear command needs >1.52ms to settle
+
 }
+
 void LCD_DRIVER::set_cursor(uint8_t row, uint8_t col)
 {
     // Code to set the cursor position on the LCD
