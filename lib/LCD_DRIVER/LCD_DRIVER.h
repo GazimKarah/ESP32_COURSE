@@ -32,6 +32,7 @@ P7        → D7
             void send_nibble(uint8_t nibble, uint8_t mode);
             void send_byte(uint8_t byte, uint8_t mode);
             void pulse_enable(uint8_t data);
+            void Update_flag(uint8_t flag, bool state);
 
         public:
 
@@ -42,6 +43,12 @@ P7        → D7
             void print_string(const char* str);
             void clear();
             void set_cursor(uint8_t row, uint8_t col);
+            void display_on();
+            void display_off();
+            void cursor_on();
+            void cursor_off();
+            void blink_on();
+            void blink_off();
     };
 
 #endif

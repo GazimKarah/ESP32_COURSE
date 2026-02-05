@@ -43,7 +43,15 @@ void LCD_DRIVER::send_byte(uint8_t byte, uint8_t mode)
     send_nibble(low_nibble, mode);
 }
 
+void LCD_DRIVER::Update_flag(uint8_t flag, bool state)
+{
+    static uint8_t display_control = 0x08; // Display control mandatory bit
+    // 0x04 Display ON/OFF control bit
+    // 0x02 Cursor ON/OFF control bit
+    // 0x01 Blinking ON/OFF control bit
 
+    send_byte(display_control | flag, LCD_CMD_MODE);
+}
 
 void LCD_DRIVER::init()
 {
@@ -66,7 +74,7 @@ void LCD_DRIVER::init()
     send_nibble(0x00, LCD_CMD_MODE); // Display ON
     send_nibble(0x0C, LCD_CMD_MODE);
 
-    send_nibble(0x00, LCD_CMD_MODE); //Display Clear
+    send_nibble(0x00, LCD_CMD_MODE); // Display Clear
     send_nibble(0x01, LCD_CMD_MODE);
     delay(2);
 
@@ -102,8 +110,40 @@ void LCD_DRIVER::set_cursor(uint8_t row, uint8_t col)
     // Code to set the cursor position on the LCD
     uint8_t row_offsets[] = {0x00, 0x40};
 
+    if(row > 1) row = 1; // Limit to 2 rows
+    else { row = 0; } // Default to row 0 if invalid
+
+    if(col > 15) col = 15; // Limit to 16 columns
+    else { col = 0; } // Default to column 0 if invalid
+
     uint8_t position = col + row_offsets[row];
 
     send_byte(0x80 | position, LCD_CMD_MODE); // Set DDRAM address
 
+}
+
+void LCD_DRIVER::display_on()
+{
+    // Code to turn on the display
+    Update_flag (0x04,true);
+}
+void LCD_DRIVER::display_off(){
+    // Code to turn off the display
+    Update_flag (0x04,false);
+}
+void LCD_DRIVER::cursor_on(){
+    // Code to turn on the cursor
+    Update_flag (0x02,true);
+}
+void LCD_DRIVER::cursor_off(){
+    // Code to turn off the cursor
+    Update_flag (0x02,false);
+}
+void LCD_DRIVER::blink_on(){
+    // Code to turn on blinking cursor
+    Update_flag (0x01,true);
+}
+void LCD_DRIVER::blink_off(){
+    // Code to turn off blinking cursor
+    Update_flag (0x01,false);
 }
