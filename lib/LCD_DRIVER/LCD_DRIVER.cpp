@@ -91,8 +91,10 @@ void LCD_DRIVER::print_char(char c)
 
 void LCD_DRIVER::print_string(const char* str)
 {
+    int count = 0;
     // Code to print a string on the LCD
-    while (*str !='\0'){
+    while (*str !='\0' && count < 16){
+        count++;
         print_char(*str);
         str++;
     }
@@ -110,10 +112,10 @@ void LCD_DRIVER::set_cursor(uint8_t row, uint8_t col)
     // Code to set the cursor position on the LCD
     uint8_t row_offsets[] = {0x00, 0x40};
 
-    if(row > 1) row = 1; // Limit to 2 rows
+    if(row >= 1) row = 1; // Limit to 2 rows
     else { row = 0; } // Default to row 0 if invalid
 
-    if(col > 15) col = 15; // Limit to 16 columns
+    if(col >= 15) col = 15; // Limit to 16 columns
     else { col = 0; } // Default to column 0 if invalid
 
     uint8_t position = col + row_offsets[row];
