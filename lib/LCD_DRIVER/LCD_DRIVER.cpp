@@ -116,7 +116,7 @@ void LCD_DRIVER::set_cursor(uint8_t row, uint8_t col)
     else { row = 0; } // Default to row 0 if invalid
 
     if(col >= 15) col = 15; // Limit to 16 columns
-    else { col = 0; } // Default to column 0 if invalid
+    else if (col < 0 ){ col = 0; } // Default to column 0 if invalid
 
     uint8_t position = col + row_offsets[row];
 
