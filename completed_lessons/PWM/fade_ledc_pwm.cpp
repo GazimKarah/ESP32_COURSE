@@ -11,8 +11,8 @@ hw_timer_t *LEDC_timer = NULL;
 
 void IRAM_ATTR ledTimer();
 
-volatile int current_duty = 0;
-volatile int fadeAmount = 5;
+volatile double current_duty = 0;
+volatile double fadeAmount = 5;
 
 void setup() {
 
@@ -42,3 +42,4 @@ void IRAM_ATTR ledTimer(){
   }
 
 }
+

@@ -67,7 +67,7 @@ void loop() {
     if (temp_val <  0) temp_val = 0;
 
     pwm_out = temp_val;
-
+    
     ledcWrite(LEDC_CHANNEL_0, pwm_out);
 
     adc_flag = false;
